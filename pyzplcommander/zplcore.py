@@ -297,11 +297,3 @@ class ZplLabel(ZplCommandsDump):
 
     def add_field(self) -> ZplLabelField:
         return ZplLabelField(self)
-
-
-with ZplLabel(ZplPromptFakePrinter()) as lb:
-    lb.add_field().set_text('Mundo').set_position(100,50).set_font(ZplStandardFonts.FONT_A).finalize_field()
-    with lb.add_field() as fd:
-        fd.set_text('Ola')
-        fd.set_position(10, 10)
-        fd.set_font(ZplStandardFonts.FONT_D)

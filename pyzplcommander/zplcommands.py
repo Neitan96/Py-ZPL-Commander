@@ -20,6 +20,13 @@ class ZplDirection(Enum):
     REVERSE = 'R'
 
 
+class ZplJustification(Enum):
+    LEFT = 'L'
+    CENTER = 'C'
+    RIGHT = 'R'
+    JUSTIFIED = 'J'
+
+
 zpl_font_text = namedtuple('zpl_font', ['name', 'min_height', 'min_width', 'type'])
 
 
@@ -70,6 +77,9 @@ class ZplCommands(Enum):
     ])
     FIELD_DIRECTION = zpl_command('^FP', 'Permite impressão na vertical e reverso', [
         'direction', 'additional inter-character'
+    ])
+    FIELD_BLOCK = zpl_command('^FB', 'Campo em bloco para quebras de linhas', [
+        'width', 'number of lines', 'space between lines', 'text justification', 'hanging indent seconds lines'
     ])
 
     # Controles da impressora

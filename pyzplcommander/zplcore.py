@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import socket
 
-from pyzplcommander.zplcommands import ZplCommands, ZplStandardFonts, ZplOrientation, ZplDirection
+from pyzplcommander.zplcommands import ZplCommands, ZplStandardFonts, ZplOrientation, ZplDirection, ZplJustification
 
 
 class ZplPrinter(ABC):
@@ -235,12 +235,12 @@ class ZplLabelField(ZplCommandsDump):
         self.set_command(text_value, position=11)
         return self
 
-    def set_position(self, x: int, y: int):
+    def position(self, x: int, y: int):
         self.add_command(ZplCommands.FIELD_ORIGIN, [x, y])
         return self
 
-    def set_font(self, font_name: str | ZplStandardFonts, orientation: str | ZplOrientation = None,
-                 height: int = None, width: int = None):
+    def font(self, font_name: str | ZplStandardFonts, orientation: str | ZplOrientation = None,
+             height: int = None, width: int = None):
 
         if isinstance(font_name, ZplStandardFonts):
             font_name = font_name.value.name
@@ -251,8 +251,8 @@ class ZplLabelField(ZplCommandsDump):
         self.add_command(ZplCommands.FIELD_FONT, [font_name, orientation, height, width])
         return self
 
-    def set_custom_font(self, font: str, orientation: str | ZplOrientation = None,
-                        height: int = None, width: int = None):
+    def custom_font(self, font: str, orientation: str | ZplOrientation = None,
+                    height: int = None, width: int = None):
 
         if isinstance(orientation, ZplOrientation):
             orientation = orientation.value
@@ -260,12 +260,23 @@ class ZplLabelField(ZplCommandsDump):
         self.add_command(ZplCommands.FIELD_FONT, [orientation, height, width, font])
         return self
 
-    def set_direction(self, direction: str | ZplDirection = 'V', additional_chars: int = None):
+    def direction(self, direction: str | ZplDirection = 'V', additional_chars: int = None):
 
         if isinstance(direction, ZplDirection):
             direction = direction.value
 
         self.add_command(ZplCommands.FIELD_DIRECTION, [direction, additional_chars])
+        return self
+
+    def multiline_block(self, width_block: int = None, number_lines: int = None, space_between_lines: int = None,
+                        text_justification: str | ZplJustification = None, indent_seconds_line: int = None):
+
+        if isinstance(text_justification, ZplJustification):
+            text_justification = text_justification.value
+
+        self.add_command(ZplCommands.FIELD_BLOCK, [
+            width_block, number_lines, space_between_lines, text_justification, indent_seconds_line
+        ])
         return self
 
 
@@ -284,16 +295,16 @@ class ZplLabel(ZplCommandsDump):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.send_command()
 
-    def set_default_font(self, font: ZplStandardFonts | str, height: int | None = None, width: int | None = None):
+    def font(self, font: ZplStandardFonts | str, height: int | None = None, width: int | None = None):
         if isinstance(font, ZplStandardFonts):
             font = font.value.name
 
         self.add_command(ZplCommands.LABEL_FONT_DEFAULT, [font, height, width])
         return self
 
-    def add_comment(self, comment: str):
+    def comment(self, comment: str):
         self.add_command(ZplCommands.FIELD_COMMENT, [comment])
         return self
 
-    def add_field(self) -> ZplLabelField:
+    def new_field(self) -> ZplLabelField:
         return ZplLabelField(self)

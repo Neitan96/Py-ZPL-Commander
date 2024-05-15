@@ -169,7 +169,7 @@ class ZplBarcode(Enum):
         'height (2-32000), Default: 8',
         'security level (1-8), Default: 0',
         'number of characters per row (2-62)',
-        'number of rows to encode (CODABLOCK A:1-22 | CODABLOCK E:2-4)',
+        'number of rows to encode (CODABLOCK A:1-22 | CODABLOCK E-F:2-4)',
         'mode (A=Code 39, F=Code128, E=Code128 auto FNC1), Default: F'
     ])
     CODE_128 = zpl_barcode('^BC', 'Code 128', 'ALPHANUMERIC', [
@@ -179,4 +179,125 @@ class ZplBarcode(Enum):
         'interpretation line above code (Y,N), Default: N',
         'ucc check digit (Y,N), Default: N',
         'mode (N=no selected mode, U=ucc case mode, A=automatic mode, D=ucc/ean mode), Default: N'
+    ])
+    UPS_MAXICODE = zpl_barcode('^BD', 'UPS MaxiCode', 'TWO-DIMENSIONAL', [
+        'mode (2=numeric postal code, 3=alphanumeric postal code,'
+        '4=standard mode, 5=full eec, 6= reader program), Default: 3',
+        'symbol number (1-8), Default: 1',
+        'total symbols (1-8), Default: 1'
+    ])
+    EAN_13 = zpl_barcode('^BE', 'EAN-13', 'RETAIL LABELING', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N'
+    ])
+    MICRO_PDF417 = zpl_barcode('^BF', 'Micro PDF417', 'TWO-DIMENSIONAL', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (0-9999), Default: ^BY',
+        'mode (0-33), Default: 0'
+    ])
+    INDUSTRIAL_2_OF_5 = zpl_barcode('^BI', 'Industrial 2 of 5', 'NUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N'
+    ])
+    STANDARD_2_OF_5 = zpl_barcode('^BJ', 'Standard 2 of 5', 'NUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N'
+    ])
+    ANSI_CODABAR = zpl_barcode('^BK', 'ANSI Codabar', 'ALPHANUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'check digit (Y,N), Default: N',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N'
+        'designates a start character (A,B,C,D), Default: A',
+        'designates a stop character (A,B,C,D), Default: A'
+    ])
+    LOGMARS = zpl_barcode('^BL', 'LOGMARS', 'ALPHANUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-32000), Default: ^BY',
+        'interpretation line above code (Y,N), Default: N'
+    ])
+    MSI = zpl_barcode('^BM', 'MSI', 'NUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'check digit (Y,N), Default: N',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N',
+        'inserts digit into the interpretation line (Y,N), Default: N'
+    ])
+    AZTEC_CODE = zpl_barcode('^BO', 'Aztec Code', 'TWO-DIMENSIONAL', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'magnification factor (1-10), Default: 1',
+        'extended channel interpretation (Y,N), Default: N',
+        'error control and symbol size (1-300), Default: 0',
+        'menu symbol (Y,N), Default: N',
+        'number of symbols (1-26), Default: 1',
+        'ID field for structured append (text 24 characters max), Default: 0'
+    ])
+    PLESSEY_CODE = zpl_barcode('^BP', 'Plessey Code', 'ALPHANUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'print check digit (Y,N), Default: N',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N'
+    ])
+    QR_CODE = zpl_barcode('^BQ', 'QR Code', 'TWO-DIMENSIONAL', [
+        'field orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'model (1-2), Default: 2',
+        'magnification factor (1-10), Default: 1',
+        'error correction (h=ultra high, q=high, m=medium, l=low), Default: H',
+        'mask value (0-7), Default: 7'
+    ])
+    GS1_DATABAR = zpl_barcode('^BS', 'GS1 DataBar', 'TWO-DIMENSIONAL', [
+        'orientation (N=Normal, R=rotated, I=inverted, B=bottom up), Default: R',
+        'symbology type (1=omnidirectional, 2=truncated, 3=stacked, 4=stacked omnidirectional,'
+        '5=limited, 6=expanded, 7=upc-a, 8=upc-e, 9=ean-13, 11=ucc-128 ab, 12=ucc-128 c) Default: 1',
+        'magnification factor (1-10), Default: 1',
+        'separator height (1-2), Default: 1',
+        'bar code height (1-32000), Default: 25',
+        'the segment width (2-22), Default: 22',
+    ])
+    UPC_EAN_EXTENSION = zpl_barcode('^BS', 'UPC/EAN Extension', 'RETAIL LABELING', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N'
+    ])
+    TLC39 = zpl_barcode('^BT', 'TLC39', 'ALPHANUMERIC', [
+        'orientation (N=Normal, R=rotated, I=inverted, B=bottom up)',
+        'width of the code 39 bar code (1-10)',
+        'wide to narrow ratio (2.0-3.0), Default: 2.0',
+        'height of the bar code (1-9999)',
+        'row height of the micro pdf417 bar code (1-255)',
+        'narrow bar width of the code 39 bar code (1-10)'
+    ])
+    UPC_A = zpl_barcode('^BU', 'UPC-A', 'RETAIL LABELING', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-9999), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N',
+        'print check digit (Y,N), Default: Y'
+    ])
+    DATA_MATRIX = zpl_barcode('^BX', 'Data Matrix', 'TWO-DIMENSIONAL', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height of individual symbol (1-width of label), Default: ^BY',
+        'quality level (0, 50, 80, 100, 140, 200), Default: 0',
+        'columns to encode (9-49)',
+        'rows to encode (9-49)',
+        'format id (1-6), Default: 6',
+        'escape sequence control (any character), Default: ~',
+        'aspect ratio (1-2), Default: 1'
+    ])
+    POSTAL_CODE = zpl_barcode('^BZ', 'Postal Code', 'ALPHANUMERIC', [
+        'orientation (N=Normal, R=90 degrees, I=180 degrees, B=270 degrees), Default: ^FW',
+        'height (1-32000), Default: ^BY',
+        'interpretation line (Y,N), Default: Y',
+        'interpretation line above code (Y,N), Default: N',
+        'postal code type (0-3), Default: 0'
     ])

@@ -7,7 +7,7 @@ from pyzplcommander.commands import ZplCommands
 from pyzplcommander.label import ZplLabel
 
 
-class ZplPrinter(ZplCommandSender, ABC):
+class ZebraPrinter(ZplCommandSender, ABC):
     """Classe base para impressoras ZPL."""
 
     def new_label(self) -> ZplLabel:
@@ -19,7 +19,7 @@ class ZplPrinter(ZplCommandSender, ABC):
         return ZplLabel(self)
 
 
-class ZplPromptFakePrinter(ZplPrinter):
+class ZebraPromptFakePrinter(ZebraPrinter):
     """Classe de impressora falsa para testes de prompt de comando."""
 
     def send_command(self, command: str, get_response: bool = False) -> None | str:
@@ -27,19 +27,19 @@ class ZplPromptFakePrinter(ZplPrinter):
         return None
 
 
-class ZplNetworkPrinter(ZplPrinter):
+class ZebraNetworkPrinter(ZebraPrinter):
     """Classe de impressora conectada via rede.
 
     A impressora deve estar configurada para receber comandos ZPL via TCP/IP.
 
     Args:
-        printer_host (str): Endereço IP ou nome de domínio da impressora.
-        printer_port (int): Porta de comunicação da impressora (default: 9100).
+        host (str): Endereço IP ou nome de domínio da impressora.
+        port (int): Porta de comunicação da impressora (default: 9100).
         timeout (int): Tempo limite de espera para resposta da impressora (default: None).
     """
 
-    printer_host: str
-    printer_port: int
+    host: str
+    port: int
 
     connection: socket.socket
     default_timeout: float
@@ -47,10 +47,10 @@ class ZplNetworkPrinter(ZplPrinter):
     check_conn_on_send: bool
     auto_close_conn_on_send: bool
 
-    def __init__(self, printer_host: str, printer_port: int = 9100, timeout: int = None):
+    def __init__(self, host: str, port: int = 9100, timeout: int = None):
         super().__init__()
-        self.printer_host = printer_host
-        self.printer_port = printer_port
+        self.host = host
+        self.port = port
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if timeout is None:
             self.default_timeout = -1
@@ -62,7 +62,7 @@ class ZplNetworkPrinter(ZplPrinter):
 
     def connect(self) -> None:
         """Conecta-se à impressora."""
-        self.connection.connect((self.printer_host, self.printer_port))
+        self.connection.connect((self.host, self.port))
         if self.default_timeout < 0:
             self.default_timeout = self.connection.timeout
 

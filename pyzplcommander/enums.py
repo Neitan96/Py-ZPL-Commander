@@ -1,7 +1,16 @@
 from enum import Enum
 
 
-class GraphicSymbol(Enum):
+class EnumBase(Enum):
+    """Classe base para enumerações."""
+    def __str__(self):
+        return str(self.value)
+
+    def __call__(self):
+        return str(self.value)
+
+
+class GraphicSymbol(EnumBase):
     """Símbolos gráficos."""
     REGISTERED_TRADE_MARK = 'A'
     COPYRIGHT = 'B'
@@ -10,19 +19,19 @@ class GraphicSymbol(Enum):
     CANADIAN_STANDARDS_ASSOCIATION = 'E'
 
 
-class ZplPrintOrientation(Enum):
+class ZplPrintOrientation(EnumBase):
     """Orientação de campo."""
     NORMAL = 'N'  # Normal
     INVERT = 'I'  # Invertido
 
 
-class DiagonalOrientation(Enum):
+class DiagonalOrientation(EnumBase):
     """Orientação diagonal."""
     RIGHT = 'R'  # Direita
     LEFT = 'L'  # Esquerda
 
 
-class ZplOrientation(Enum):
+class ZplOrientation(EnumBase):
     """Orientação de campo."""
     NORMAL = 'N'  # 0 graus
     ROTATE_90 = 'R'  # 90 graus
@@ -30,14 +39,14 @@ class ZplOrientation(Enum):
     ROTATE_270 = 'B'  # 270 graus
 
 
-class ZplDirection(Enum):
+class ZplDirection(EnumBase):
     """Direção do texto."""
     VERTICAL = 'V'  # Vertical
     HORIZONTAL = 'H'  # Horizontal
     REVERSE = 'R'  # Reverso
 
 
-class ZplJustification(Enum):
+class ZplJustification(EnumBase):
     """Justificação de texto."""
     LEFT = 'L'  # Esquerda
     CENTER = 'C'  # Centralizado
@@ -58,7 +67,7 @@ class ZplFont:
         return self.name
 
 
-class ZplCharSets(Enum):
+class ZplCharSets(EnumBase):
     """Conjuntos de caracteres de texto."""
     USA_1 = '0'  # USA 1
     USA_2 = '1'  # USA 2
@@ -91,7 +100,7 @@ class ZplCharSets(Enum):
     ZEBRA_CODE_1255 = '36'  # Zebra Code Page 1255, only firmware .16+
 
 
-class ZplStandardFonts6Dots(Enum):
+class ZplStandardFonts6Dots(EnumBase):
     """Fontes padrão de 6 pontos."""
     FONT_A = ZplFont('A', 9, 5, 'U-L-D')  # Uppercase, Lowercase, Digits
     FONT_B = ZplFont('B', 11, 7, 'U')  # Uppercase
@@ -104,7 +113,7 @@ class ZplStandardFonts6Dots(Enum):
     FONT_0 = ZplFont('0', 15, 12, 'U-L-D')  # Uppercase, Lowercase, Digits
 
 
-class ZplStandardFonts8Dots(Enum):
+class ZplStandardFonts8Dots(EnumBase):
     """Fontes padrão de 8 pontos, 203 DPI."""
     FONT_A = ZplFont('A', 9, 5, 'U-L-D')  # Uppercase, Lowercase, Digits
     FONT_B = ZplFont('B', 11, 7, 'U')  # Uppercase
@@ -124,7 +133,7 @@ class ZplStandardFonts8Dots(Enum):
     FONT_0 = ZplFont('0', 15, 12, 'U-L-D')  # Uppercase, Lowercase, Digits
 
 
-class ZplStandardFonts12Dots(Enum):
+class ZplStandardFonts12Dots(EnumBase):
     """Fontes padrão de 12 pontos, 300 DPI."""
     FONT_A = ZplFont('A', 9, 5, 'U-L-D')  # Uppercase, Lowercase, Digits
     FONT_B = ZplFont('B', 11, 7, 'U')  # Uppercase
@@ -144,7 +153,7 @@ class ZplStandardFonts12Dots(Enum):
     FONT_0 = ZplFont('0', 15, 12, 'U-L-D')  # Uppercase, Lowercase, Digits
 
 
-class ZplStandardFonts24Dots(Enum):
+class ZplStandardFonts24Dots(EnumBase):
     """Fontes padrão de 24 pontos, 600 DPI."""
     FONT_A = ZplFont('A', 9, 5, 'U-L-D')  # Uppercase, Lowercase, Digits
     FONT_B = ZplFont('B', 11, 7, 'U')  # Uppercase

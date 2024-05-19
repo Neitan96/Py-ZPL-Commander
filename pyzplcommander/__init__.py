@@ -6,6 +6,6 @@ from .enums import ZplStandardFonts6Dots, ZplStandardFonts8Dots, ZplStandardFont
 
 from .commands import ZplCommands
 
-from .printers import ZplPrinter, ZplPromptFakePrinter, ZplNetworkPrinter
+from .printers import ZebraPrinter, ZebraPromptFakePrinter, ZebraNetworkPrinter
 
 from .label import ZplLabel, ZplLabelField

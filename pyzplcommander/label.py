@@ -227,6 +227,28 @@ class ZplLabel(ZplCommandsBlock):
         self.add_command(field)
         return field
 
+    def draw_text(self, text: str, x: int = None, y: int = None, font: str = None,
+                  height: int = None, width: int = None, orientation: Literal['N', 'R', 'I', 'B'] = None):
+        """Adiciona um campo de texto à etiqueta.
+
+        Args:
+            text (str): Texto/Data de até 3072 bytes.
+            x (int, optional): Coordenada X em pontos(0-32000), definido com o comando ^FO.
+            y (int, optional): Coordenada Y em pontos(0-32000), definido com o comando ^FO.
+            font (str, optional): Nome da fonte, caso não seja informado, será utilizada a fonte padrão definida pelo comando ^CF.
+            height (int, optional): Altura da fonte em pontos(10-32000).
+            width (int, optional): Largura da fonte em pontos(10-32000).
+            orientation (str, optional): Orientação do texto, valores possíveis:
+                                        'N'=normal, 'I'=rotação de 90º, 'R'=rotação de 180º, 'B'=rotação de 270º.
+        """
+        field = ZplLabelField()
+        if x or y:
+            field.position(x, y)
+        if font or height or width or orientation:
+            field.font(font, orientation, height, width)
+        field.data(text)
+        self.add_command(field)
+
     def encode_font(self, encode_enum: str | int):
         """Define o charset da fonte para os próximos campos de texto.
         O charset é utilizado para converter os caracteres especiais para os caracteres correspondentes

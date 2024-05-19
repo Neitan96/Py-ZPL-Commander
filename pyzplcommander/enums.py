@@ -1,10 +1,25 @@
 from enum import Enum
 
 
+class GraphicSymbol(Enum):
+    """Símbolos gráficos."""
+    REGISTERED_TRADE_MARK = 'A'
+    COPYRIGHT = 'B'
+    TRADE_MARK = 'C'
+    UNDERWRITERS_LABORATORIES_INC = 'D'
+    CANADIAN_STANDARDS_ASSOCIATION = 'E'
+
+
 class ZplPrintOrientation(Enum):
     """Orientação de campo."""
     NORMAL = 'N'  # Normal
     INVERT = 'I'  # Invertido
+
+
+class DiagonalOrientation(Enum):
+    """Orientação diagonal."""
+    RIGHT = 'R'  # Direita
+    LEFT = 'L'  # Esquerda
 
 
 class ZplOrientation(Enum):
@@ -41,6 +56,39 @@ class ZplFont:
 
     def __str__(self):
         return self.name
+
+
+class ZplCharSets(Enum):
+    """Conjuntos de caracteres de texto."""
+    USA_1 = '0'  # USA 1
+    USA_2 = '1'  # USA 2
+    EUROPE = '2'  # Europe
+    HOLLAND = '3'  # Holland
+    DENMARK_NORWAY = '4'  # Denmark/Norway
+    SWEDEN_FINLAND = '5'  # Sweden/Finland
+    GERMANY = '6'  # Germany
+    FRANCE_1 = '7'  # France 1
+    FRANCE_2 = '8'  # France 2
+    ITALY = '9'  # Italy
+    SPAIN = '10'  # Spain
+    SINGLE_BYTE = '11'  # Single byte
+    SINGLE_BYTE_JAPAN = '12'  # Single byte Japan
+    ZEBRA_CODE_850 = '13'  # Zebra Code Page 850
+    DOUBLE_BYTE = '14'  # Double byte, only firmware .14+
+    SHIFT_JIS = '15'  # Shift JIS, only firmware .14+
+    EUC_JP_CN = '16'  # EUC-JP, only firmware .14+
+    BIG_ENDIAN = '17'  # Big 5, only firmware .14+
+    SINGLE_BYTE_ASIAN = '24'  # Single byte Asian, only firmware .14+
+    MULTIBYTE_ASIAN = '26'  # Multibyte Asian, only firmware .14+
+    ZEBRA_CODE_1252 = '27'  # Zebra Code Page 1252, only firmware .14+
+    UTF_8 = '28'  # UTF-8, only firmware .14+
+    UTF_16_BIG_ENDIAN = '29'  # UTF-16, only firmware .14+
+    UTF_16_LITTLE_ENDIAN = '30'  # UTF-16, only firmware .14+
+    ZEBRA_CODE_1250 = '31'  # Zebra Code Page 1250, only firmware .16+
+    ZEBRA_CODE_1251 = '33'  # Zebra Code Page 1251, only firmware .16+
+    ZEBRA_CODE_1253 = '34'  # Zebra Code Page 1253, only firmware .16+
+    ZEBRA_CODE_1254 = '35'  # Zebra Code Page 1254, only firmware .16+
+    ZEBRA_CODE_1255 = '36'  # Zebra Code Page 1255, only firmware .16+
 
 
 class ZplStandardFonts6Dots(Enum):

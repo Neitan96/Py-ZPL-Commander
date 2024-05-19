@@ -118,7 +118,7 @@ class ZplCommandParams:
 
     def __init__(self, command: ZplCommand | str, params: list[str | any] = None):
         self.command = command
-        self.params = [str(param) for param in params]
+        self.params = [str(param) if param is not None else None for param in params]
 
     def set_param_by_name(self, param: str, value: str):
         """Define o valor de um parâmetro pelo nome do parâmetro.
@@ -191,7 +191,7 @@ class ZplCommandParams:
                 last_value = index
                 break
 
-        return ','.join(map(lambda x: None if x is None else str(x), params[:last_value+1]))
+        return ','.join(map(lambda x: '' if x is None else str(x), params[:last_value+1]))
 
     def format_to_zpl(self) -> str:
         """Formata o comando com os parâmetros e valor para o formato ZPL."""
@@ -286,6 +286,31 @@ class ZplCommandsBlock:
         return (f'<ZplCommandsBlock: Start: {str(self.start_block)}, End: {str(self.end_block)}, '
                 f'Commands: {str(self.commands)}>')
 
+    def add_zpl_blank_line(self, lines: int = 1):
+        """Adiciona uma ou mais linhas em branco no código ZPL.
+        Funciona somente quando é formado com quebras de linha.
+
+        Args:
+            lines (int, optional): Quantidade de linhas em branco
+        """
+        for _ in range(lines):
+            self.add_command('')
+        return self
+
+    def _format_commands_to_zpl(self, break_lines: bool = True) -> str:
+        """Formata os comandos para o formato ZPL.
+
+        Args:
+            break_lines (bool, optional): Quebra de linha
+        """
+        lines = []
+        for command in self.get_commands():
+            if isinstance(command, ZplCommandsBlock):
+                lines.append(command.format_to_zpl(False))
+            else:
+                lines.append(str(command))
+        return '\r\n'.join(lines) if break_lines else ''.join(lines)
+
     def format_to_zpl(self, break_lines: bool = True) -> str:
         """Formata o bloco de comandos para o formato ZPL.
 
@@ -295,7 +320,7 @@ class ZplCommandsBlock:
         lines = []
         if self.start_block is not None:
             lines.append(str(self.start_block))
-        lines.extend(self.get_commands())
+        lines.append(self._format_commands_to_zpl(break_lines))
         if self.end_block is not None:
             lines.append(str(self.end_block))
         return '\r\n'.join(lines) if break_lines else ''.join(lines)

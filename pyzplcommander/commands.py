@@ -23,7 +23,7 @@ class ZplCommands(Enum):
         params_required=1
     )
 
-    # Propriedades da etiqueta
+    # Propriedades de campos
     FIELD_COMMENT = ZplCommand(
         command='^FX',
         description='Comentário',
@@ -33,8 +33,8 @@ class ZplCommands(Enum):
     FIELD_ORIGIN = ZplCommand(
         command='^FO',
         description='Define a posição de origem do campo',
-        params_description=['x', 'y'],
-        params_required=2
+        params_description=['x', 'y', 'justification'],
+        params_required=0
     )
     FIELD_DATA = ZplCommand(
         command='^FD',
@@ -62,7 +62,7 @@ class ZplCommands(Enum):
     FIELD_ORIENTATION = ZplCommand(
         command='^FW',
         description='Define a orientação do campo',
-        params_description=['orientation'],
+        params_description=['orientation', 'justification'],
         params_required=1
     )
     FIELD_DIRECTION = ZplCommand(
@@ -78,6 +78,13 @@ class ZplCommands(Enum):
         params_description=['width_line', 'max_lines', 'space_between_lines', 'text_justification',
                             'indent_seconds_line'],
         params_required=0
+    )
+    FIELD_HEX_INDICATOR = ZplCommand(
+        command='^FH',
+        description='Indicador de dados hexadecimal',
+        params_description=['indicator'],
+        params_default=['_'],
+        params_required=1
     )
 
     # Propriedades da etiqueta
@@ -121,6 +128,13 @@ class ZplCommands(Enum):
         params_default=['N'],
         params_required=1
     )
+    CHANGE_ENCODING = ZplCommand(
+        command='^CI',
+        description='Define a codificação de fonte',
+        params_description=['encoding'],
+        params_default=['0'],
+        params_required=1
+    )
 
     # Controles da impressora
 
@@ -135,11 +149,53 @@ class ZplCommands(Enum):
         params_required=1
     )
 
+    # Gráficos
+
+    GRAPHIC_BOX = ZplCommand(
+        command='^GB',
+        description='Desenha uma caixa',
+        params_description=['width', 'height', 'border_thickness', 'line_color', 'rounding'],
+        params_default=['3', '3', '1', 'B', '0'],
+        params_required=0
+    )
+    GRAPHIC_CIRCLE = ZplCommand(
+        command='^GC',
+        description='Desenha um círculo',
+        params_description=['diameter', 'border_thickness', 'line_color'],
+        params_default=['3', '1', 'B'],
+        params_required=0
+    )
+    GRAPHIC_DIAGONAL = ZplCommand(
+        command='^GD',
+        description='Desenha uma linha diagonal',
+        params_description=['width', 'height', 'border_thickness', 'line_color', 'diagonal_orientation'],
+        params_default=['3', '3', '1', 'B', 'R'],
+        params_required=0
+    )
+    GRAPHIC_ELLIPSE = ZplCommand(
+        command='^GE',
+        description='Desenha uma elipse',
+        params_description=['width', 'height', 'border_thickness', 'line_color'],
+        params_default=['3', '3', '1', 'B'],
+        params_required=0
+    )
+    GRAPHIC_SYMBOL = ZplCommand(
+        command='^GS',
+        description='Seleciona um símbolo',
+        params_description=['orientation', 'height', 'width'],
+        params_default=['N', '^CF', '^CF'],
+        params_required=0
+    )
+
     # Status e funções da impressora
 
     PRINTER_STATUS = ZplCommand(
         command='~HS',
         description='Solicita o status da impressora'
+    )
+    PRINT_HEAD_TEST = ZplCommand(
+        command='^JT',
+        description='Teste de cabeçote de impressão'
     )
 
     # Configurações do ZPL
@@ -305,14 +361,6 @@ class ZplCommands(Enum):
         params_default=['^FW', 'B', '^BY', 'Y', 'N', 'N'],
         params_required=0
     )
-    BARCODE_AZTEC_CODE = ZplCommand(
-        command='^BZ',
-        description='Código de barras Aztec Code',
-        params_description=['orientation', 'magnification_factor', 'extended_channel', 'error control', 'menu symbol',
-                            'number_of_symbols', 'id_field'],
-        params_default=['^FW', '1', 'N', '0', 'N', '1', ''],
-        params_required=0
-    )
     BARCODE_PLESSEY_CODE = ZplCommand(
         command='^BP',
         description='Código de barras Plessey Code',
@@ -373,5 +421,13 @@ class ZplCommands(Enum):
         params_description=['orientation', 'height', 'interpretation_line', 'interpretation_line_above',
                             'postal_code_type'],
         params_default=['^FW', '^BY', 'N', 'N', '0'],
+        params_required=0
+    )
+    BARCODE_AZTEC_CODE = ZplCommand(
+        command='^BZ',
+        description='Código de barras Aztec Code',
+        params_description=['orientation', 'magnification_factor', 'extended_channel', 'error control', 'menu symbol',
+                            'number_of_symbols', 'id_field'],
+        params_default=['^FW', '1', 'N', '0', 'N', '1', ''],
         params_required=0
     )

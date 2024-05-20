@@ -54,6 +54,27 @@ class ZplJustification(EnumBase):
     JUSTIFIED = 'J'  # Justificado
 
 
+class ZplRTCChars(EnumBase):
+    """Caracteres para formatação de data e hora."""
+    WEEKDAY_NAME_ABBR = 'a'  # Nome abreviado do dia da semana
+    WEEKDAY_NAME = 'A'  # Nome completo do dia da semana
+    MONTH_NAME_ABBR = 'b'  # Nome abreviado do mês
+    MONTH_NAME = 'B'  # Nome completo do mês
+    MONTH_DAY = 'd'  # Dia do mês 01-31
+    HOUR_24 = 'H'  # Hora do dia 00-23
+    HOUR_12 = 'I'  # Hora do dia 01-12
+    DAY_OF_YEAR = 'j'  # Dia do ano 001-366
+    MONTH_NUMBER = 'm'  # Mês do ano 01-12
+    MINUTE = 'M'  # Minuto 00-59
+    AM_PM = 'p'  # AM/PM
+    SECOND = 'S'  # Segundo 00-59
+    WEEK_OF_YEAR_SUNDAY = 'U'  # Semana do ano, domingo como primeiro dia da semana 00-53
+    WEEK_OF_YEAR_MONDAY = 'W'  # Semana do ano, segunda-feira como primeiro dia da semana 00-53
+    DAY_OF_WEEK = 'w'  # Dia da semana 0-6 (0 = domingo)
+    YEAR_2 = 'y'  # Ano com dois dígitos
+    YEAR_4 = 'Y'  # Ano com quatro dígitos
+
+
 class ZplFont:
     """Fonte ZPL."""
 

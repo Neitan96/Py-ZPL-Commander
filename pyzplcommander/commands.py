@@ -86,6 +86,13 @@ class ZplCommands(Enum):
         params_default=['_'],
         params_required=1
     )
+    FIELD_CLOCK = ZplCommand(
+        command='^FC',
+        description='Ativa a impressão de data e hora',
+        params_description=['char_indicator_1', 'char_indicator_2', 'char_indicator_3'],
+        params_default=['%', '', ''],
+        params_required=0
+    )
 
     # Propriedades da etiqueta
 
@@ -261,7 +268,7 @@ class ZplCommands(Enum):
     BARCODE_PD417 = ZplCommand(
         command='^B7',
         description='Código de barras PDF417',
-        params_description=['orientation', 'height_individual_row', 'security_level', 'columns', 'rows' , 'truncate'],
+        params_description=['orientation', 'height_individual_row', 'security_level', 'columns', 'rows', 'truncate'],
         params_default=['^FW', '^BY', '0', '1:2', '1:2', 'N'],
         params_required=0
     )

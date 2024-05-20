@@ -11,11 +11,14 @@ with zebra_printer.new_label() as lb:
     lb.font(font=ZplStandardFonts8Dots.FONT_B())
     lb.draw_text(text='Simple ZPL label', x=20, y=35)
     lb.add_zpl_blank_line()
+    lb.comment('Field of description')
     with lb.new_field() as fd:
+        fd.data("Its is advanced field builder")
         fd.position(x=20, y=50)
         fd.font(font=ZplStandardFonts8Dots.FONT_D())
         fd.direction(direction=ZplDirection.VERTICAL(), additional_inter_chars=3)
-        fd.data("It's is advanced field builder")
 
     # Para visualizar o código ZPL gerado use o método format_to_zpl()
     print(lb.format_to_zpl(break_lines=True))
+
+    # Ao final do bloco with o código ZPL é enviado para a impressora

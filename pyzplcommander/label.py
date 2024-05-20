@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Literal
 
-from pyzplcommander.core import ZplCommandsBlock, ZplCommandSender, ZplCommandParams
+from pyzplcommander.core import ZplCommandsBlock, ZplCommandSender
 from pyzplcommander.commands import ZplCommands
 
 
@@ -32,6 +32,44 @@ class ZplLabelField(ZplCommandsBlock):
         self.add_command(ZplCommands.FIELD_HEX_INDICATOR(hex_indicator))
         return self
 
+    def enable_clock(self, char_indicator_1: str = None, char_indicator_2: str = None, char_indicator_3: str = None):
+        """Habilita a formatação de data e hora no campo de texto.
+        A formatação de data e hora é feita utilizando os caracteres especiais de formatação, sendo os caracteres
+        passados como argumento, por padrão o caractere de formatação é o '%'.
+
+        Referência dos caracteres de formatação:
+        - pyzplcommander.enums.ZplRTCChars
+
+        Tabela de caracteres de formatação:
+        - %a = Nome abreviado do dia da semana
+        - %A = Nome completo do dia da semana
+        - %b = Nome abreviado do mês
+        - %B = Nome completo do mês
+        - %d = Dia do mês 01-31
+        - %H = Hora do dia 00-23
+        - %I = Hora do dia 01-12
+        - %j = Dia do ano 001-366
+        - %m = Mês do ano 01-12
+        - %M = Minuto 00-59
+        - %p = AM/PM
+        - %S = Segundo 00-59
+        - %U = Semana do ano, domingo como primeiro dia da semana 00-53
+        - %W = Semana do ano, segunda-feira como primeiro dia da semana 00-53
+        - %w = Dia da semana 0-6 (0 = domingo)
+        - %y = Ano com dois dígitos
+        - %Y = Ano com quatro dígitos
+
+        Note:
+            Comando ZPL: ^FC
+
+        Args:
+            char_indicator_1 (str, optional): Caractere de formatação de data e hora 1.
+            char_indicator_2 (str, optional): Caractere de formatação de data e hora 2.
+            char_indicator_3 (str, optional): Caractere de formatação de data e hora 3.
+        """
+        self.add_command(ZplCommands.FIELD_CLOCK(char_indicator_1, char_indicator_2, char_indicator_3))
+        return self
+
     def data(self, data: str):
         """Define o texto/data do campo.
         Caso o texto/data contenha caracteres especiais, é necessário realizar o escape dos mesmos,
@@ -42,7 +80,6 @@ class ZplLabelField(ZplCommandsBlock):
 
         Note:
             Comando ZPL: ^FD
-            Caso o caractere de escape for alterado, é necessário faze a alteração antes de definir o texto/data.
 
         Args:
             data (str): Texto/Data de até 3072 bytes.
@@ -86,7 +123,7 @@ class ZplLabelField(ZplCommandsBlock):
         if any(char in data for char in special_chars):
             data = ''.join(special_chars.get(i, i) for i in data)
 
-        self.add_command(ZplCommands.FIELD_DATA(data))
+        self.set_command(ZplCommands.FIELD_DATA(data), 'data')
         return self
 
     def position(self, x: int = None, y: int = None, justification: Literal['0', '1', '2'] = None):
@@ -205,7 +242,8 @@ class ZplLabel(ZplCommandsBlock):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Envia os comandos da etiqueta criada para a impressora."""
-        self.send_to(self.printer)
+        if self.printer is not None:
+            self.send_to(self.printer)
 
     def new_field(self, x: int = None, y: int = None, data: str = None):
         """Instancia um construtor de campo de texto.
@@ -235,7 +273,7 @@ class ZplLabel(ZplCommandsBlock):
             text (str): Texto/Data de até 3072 bytes.
             x (int, optional): Coordenada X em pontos(0-32000), definido com o comando ^FO.
             y (int, optional): Coordenada Y em pontos(0-32000), definido com o comando ^FO.
-            font (str, optional): Nome da fonte, caso não seja informado, será utilizada a fonte padrão definida pelo comando ^CF.
+            font (str, optional): Nome da fonte, caso não seja informado, será utilizada a fonte padrão atual.
             height (int, optional): Altura da fonte em pontos(10-32000).
             width (int, optional): Largura da fonte em pontos(10-32000).
             orientation (str, optional): Orientação do texto, valores possíveis:
@@ -304,6 +342,6 @@ class ZplLabel(ZplCommandsBlock):
         Args:
             comment (str): Comentário de até 255 caracteres.
         """
-        self.add_command(ZplCommands.FIELD_COMMENT(comment))
-        self.add_command(ZplCommands.FIELD_SEPARATOR())
+        comment = ZplCommands.FIELD_COMMENT(comment)
+        self.add_command(ZplCommandsBlock(end_block=str(ZplCommands.FIELD_SEPARATOR)).add_command(comment))
         return self

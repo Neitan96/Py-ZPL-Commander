@@ -215,7 +215,7 @@ class ZplCommandsBlock:
 
     start_block: str
     end_block: str
-    commands: dict[int, list[ZplCommandParams | str]]
+    commands: dict[str, list[ZplCommandParams | str]]
 
     def __init__(self, start_block: str = None, end_block: str = None):
         self.start_block = start_block
@@ -231,23 +231,25 @@ class ZplCommandsBlock:
         """
         return sender.send_command(str(self), get_response)
 
-    def add_command(self, command: ZplCommandParams | ZplCommandsBlock | str, position: int = 0):
+    def add_command(self, command: ZplCommandParams | ZplCommandsBlock | str, position: int | str = 0):
         """Adiciona um comando ao bloco.
 
         Args:
             command (ZplCommandParams | str): Comando ZPL
-            position (int, optional): Posição do comando
+            position (int | str, optional): Posição do comando
         """
+        position = str(position)
         if position not in self.commands:
             self.commands[position] = []
         self.commands[position].append(command)
+        return self
 
-    def new_command(self, command: ZplCommand, position: int = 0) -> ZplCommandParams:
+    def new_command(self, command: ZplCommand, position: int | str = 0) -> ZplCommandParams:
         """Cria um novo comando ao bloco.
 
         Args:
             command (ZplCommand): Comando ZPL
-            position (int, optional): Posição do comando
+            position (int | str, optional): Posição do comando
 
         Returns:
             ZplCommandParams: Comando criado
@@ -256,13 +258,14 @@ class ZplCommandsBlock:
         self.add_command(cmd_value, position)
         return cmd_value
 
-    def set_command(self, command: ZplCommandParams | ZplCommandsBlock | str, position: int = 0):
+    def set_command(self, command: ZplCommandParams | ZplCommandsBlock | str, position: int | str = 0):
         """Define um comando ao bloco.
 
         Args:
             command (ZplCommandParams | str): Comando ZPL
-            position (int, optional): Posição do comando
+            position (int | str, optional): Posição do comando
         """
+        position = str(position)
         self.commands[position] = []
         self.add_command(command, position)
 
@@ -270,11 +273,11 @@ class ZplCommandsBlock:
         """Retorna a lista de comandos."""
         return [cmd for order in sorted(self.commands.keys()) for cmd in self.commands[order]]
 
-    def get_commands_by_position(self, position: int) -> list[ZplCommandParams | ZplCommandsBlock | str]:
+    def get_commands_by_position(self, position: int | str) -> list[ZplCommandParams | ZplCommandsBlock | str]:
         """Retorna a lista de comandos por posição.
 
         Args:
-            position (int): Posição do comando
+            position (int | str): Posição do comando
         """
         return self.commands.get(position, [])
 

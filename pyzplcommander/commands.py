@@ -22,6 +22,11 @@ class ZplCommands(Enum):
         description='Solicita o status da impressora',
         command_response=True
     )
+    HOST_DIAGNOSTIC = ZplCommand(
+        command='~HD',
+        description='Solicita o diagnóstico da impressora',
+        command_response=True
+    )
 
     # Propriedades de impressão
     PRINTING_DARKNESS = ZplCommand(

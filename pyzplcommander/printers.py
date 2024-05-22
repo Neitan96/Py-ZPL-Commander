@@ -164,7 +164,39 @@ class ZebraPrinter(ZplCommandSender, ABC):
         if not status or '' not in status:
             return None
         return self._parse_host_status(self.host_status())
+    
+    def host_diagnostic(self) -> str | None:
+        """Verifica o status de diagnóstico da impressora.
 
+        Returns:
+            str: Status da impressora.
+        """
+        return self.send_command(ZplCommands.HOST_DIAGNOSTIC(), get_response=True)
+    
+    def host_diagnostic_dict(self) -> dict | None:
+        """Verifica o status de diagnóstico da impressora e retorna um dicionário.
+        
+        Se a impressora não suportar o comando de diagnóstico ou a resposta for inválida, retorna None.
+
+        Returns:
+            dict: Status de diagnóstico da impressora.
+        """
+        status = self.host_diagnostic()
+
+        def is_float(x):
+            try:
+                float(x)
+                return True
+            except:
+                return False
+        
+        status = [x for x in status[3:-3].split('\r\n') if x != '']
+        status = [x.split(':') for x in status]
+        status = [x.strip() for sublist in status for x in sublist]
+        status = [x.split(' = ') for x in status]
+        status = {key: value if not is_float(value) else float(value) for key, value in status}
+
+        return status
 
 class ZebraPromptFakePrinter(ZebraPrinter):
     """Classe de impressora falsa para testes de prompt de comando."""
@@ -203,19 +235,17 @@ class ZebraNetworkPrinter(ZebraPrinter):
         super().__init__()
         self.host = host
         self.port = port
-        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if timeout is None:
-            self.default_timeout = -1
-        else:
-            self.default_timeout = timeout
+        self.connection = None
+        self.default_timeout = timeout or -1
 
         self.check_conn_on_send = True
         self.auto_close_conn_on_send = True
 
     def connect(self) -> None:
         """Conecta-se à impressora."""
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((self.host, self.port))
-        if self.default_timeout < 0:
+        if self.default_timeout is None or self.default_timeout < 0:
             self.default_timeout = self.connection.timeout
 
     def disconnect(self) -> None:
@@ -312,6 +342,8 @@ class ZebraNetworkPrinter(ZebraPrinter):
         Returns:
             bool: True se conectado, False caso contrário.
         """
+        if self.connection is None:
+            return False
         try:
             self.connection.sendall(bytes(str(ZplCommands.FIELD_COMMENT) + 'TESTE_CONNECTION', 'UTF-8'))
         except OSError:

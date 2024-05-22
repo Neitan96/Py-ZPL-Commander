@@ -15,6 +15,14 @@ class ZplCommands(Enum):
     def __call__(self, *params) -> ZplCommandParams:
         return self.value(*params)
 
+    # Comandos de configuração
+
+    HOST_STATUS = ZplCommand(
+        command='~HS',
+        description='Solicita o status da impressora',
+        command_response=True
+    )
+
     # Propriedades de impressão
     PRINTING_DARKNESS = ZplCommand(
         command='~SD',

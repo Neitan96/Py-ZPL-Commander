@@ -6,20 +6,20 @@ class ZplCommandSender(ABC):
     """ZplCommandSender é uma classe abstrata para classes que enviam comandos ZPL."""
 
     @abstractmethod
-    def send_command(self, command: str, get_response: bool = False) -> None | str:
+    def send_command(self, command: str | any, get_response: bool = False) -> None | str:
         """Envia um comando ZPL.
 
         Args:
-            command (str): Comando ZPL
+            command (str | any): Comando ZPL
             get_response (bool, optional): Obter resposta do comando
         """
         pass
 
-    def send_commands(self, commands: list[str], get_response: bool = False) -> list[str] | None:
+    def send_commands(self, commands: list[str | any], get_response: bool = False) -> None | list[str]:
         """Envia uma lista de comandos ZPL.
 
         Args:
-            commands (list[str]): Lista de comandos ZPL
+            commands (list[str | any]): Lista de comandos ZPL
             get_response (bool, optional): Obter resposta do comando
         """
         results = []
@@ -119,6 +119,15 @@ class ZplCommandParams:
     def __init__(self, command: ZplCommand | str, params: list[str | any] = None):
         self.command = command
         self.params = [str(param) if param is not None else None for param in params]
+
+    def send_to(self, sender: ZplCommandSender, get_response: bool = False) -> None | str:
+        """Envia o comando ZPL.
+
+        Args:
+            sender (ZplCommandSender): Objeto que envia o comando
+            get_response (bool, optional): Obter resposta do comando
+        """
+        return sender.send_command(str(self), get_response)
 
     def set_param_by_name(self, param: str, value: str):
         """Define o valor de um parâmetro pelo nome do parâmetro.

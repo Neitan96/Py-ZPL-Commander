@@ -1,0 +1,70 @@
+  10                  LCD CONTRAST      
+  +17.0               DARKNESS          
+  2.0 IPS             PRINT SPEED       
+  +000                TEAR OFF          
+  TEAR OFF            PRINT MODE        
+  GAP/NOTCH           MEDIA TYPE        
+  REFLECTIVE          SENSOR SELECT     
+  DIRECT-THERMAL      PRINT METHOD      
+  609                 PRINT WIDTH       
+  0346                LABEL LENGTH      
+  P1028902/1704-00574 PRINT HEAD ID     
+  39.0IN   988MM      MAXIMUM LENGTH    
+  MAINT. OFF          EARLY WARNING     
+  NOT CONNECTED       USB COMM.         
+  BIDIRECTIONAL       PARALLEL COMM.    
+  RS232               SERIAL COMM.      
+  9600                BAUD              
+  8 BITS              DATA BITS         
+  NONE                PARITY            
+  XON/XOFF            HOST HANDSHAKE    
+  NONE                PROTOCOL          
+  NORMAL MODE         COMMUNICATIONS    
+  <~>  7EH            CONTROL PREFIX    
+  <^>  5EH            FORMAT PREFIX     
+  <,>  2CH            DELIMITER CHAR    
+  ZPL II              ZPL MODE          
+  INACTIVE            COMMAND OVERRIDE  
+  CALIBRATION         MEDIA POWER UP    
+  CALIBRATION         HEAD CLOSE        
+  DEFAULT             BACKFEED          
+  +000                LABEL TOP         
+  +0000               LEFT POSITION     
+  ENABLED             REPRINT MODE      
+  020                 WEB SENSOR        
+  024                 MEDIA SENSOR      
+  255                 TAKE LABEL        
+  086                 MARK SENSOR       
+  037                 MARK MED SENSOR   
+  000                 TRANS GAIN        
+  000                 TRANS BASE        
+  100                 TRANS LED         
+  002                 MARK GAIN         
+  088                 MARK LED          
+  DPCSWFXM            MODES ENABLED     
+  ........            MODES DISABLED    
+   832 8/MM FULL      RESOLUTION        
+  4.0                 LINK-OS VERSION   
+  V72.20.01Z <-       FIRMWARE          
+  1.3                 XML SCHEMA        
+  6.5.0 19.7          HARDWARE ID       
+  4096k............R: RAM               
+  32768k...........E: ONBOARD FLASH     
+  NONE                FORMAT CONVERT    
+  FW VERSION          IDLE DISPLAY      
+  11/02/16            RTC DATE          
+  15:45               RTC TIME          
+  DISABLED            ZBI               
+  2.1                 ZBI VERSION       
+  READY               ZBI STATUS        
+  443,279 LABELS      NONRESET CNTR     
+  443,279 LABELS      RESET CNTR1       
+  443,279 LABELS      RESET CNTR2       
+  1,330,385 IN        NONRESET CNTR     
+  1,330,385 IN        RESET CNTR1       
+  1,330,385 IN        RESET CNTR2       
+  3,379,178 CM        NONRESET CNTR     
+  3,379,178 CM        RESET CNTR1       
+  3,379,178 CM        RESET CNTR2       
+  001 WIRED           SLOT 1            
+

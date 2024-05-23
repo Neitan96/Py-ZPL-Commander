@@ -1,0 +1,20 @@
+
+Head Temp = 24
+Head Temp = 24
+Ambient Temp = 165
+Head Test = Test Not Run
+Darkness Adjust = 17
+Print Speed = 2.0
+Slew Speed = 2.0
+Backfeed Speed = 2.0
+Static_pitch_length = 0346
+Dynamic_pitch_length = 0362
+Max_dynamic_pitch_length = 0366
+Min_dynamic_pitch_length = 0359
+COMMAND PFX = ~ : FORMAT PFX = ^ : DELIMITER = ,
+Dynamic_top_position = 0000
+
+No ribbon A/D = 0000
+
+PCB Temp = 163
+

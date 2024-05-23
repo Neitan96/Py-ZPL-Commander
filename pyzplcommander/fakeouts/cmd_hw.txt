@@ -1,0 +1,5 @@
+
+- DIR R:*.* 
+
+-   4171776 bytes free R: RAM 
+

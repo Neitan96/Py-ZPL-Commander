@@ -59,6 +59,11 @@ class ZplCommands(Enum):
         description='Solicita informações da impressora',
         command_response=True
     )
+    HOST_U = ZplCommand(
+        command='~HU',
+        description='Solicita informações da impressora',
+        command_response=True
+    )
 
     # Propriedades de impressão
     PRINTING_DARKNESS = ZplCommand(

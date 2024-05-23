@@ -27,6 +27,38 @@ class ZplCommands(Enum):
         description='Solicita o diagnóstico da impressora',
         command_response=True
     )
+    HOST_CONFIGURATION = ZplCommand(
+        command='^HH',
+        description='Solicita a configuração da impressora',
+        command_response=True
+    )
+    HOST_INFORMATION = ZplCommand(
+        command='~HI',
+        description='Solicita informações da impressora',
+        command_response=True
+    )
+    HOST_MEMORY = ZplCommand(
+        command='~HM',
+        description='Solicita informações de memória da impressora',
+        command_response=True
+    )
+    HOST_QUERY = ZplCommand(
+        command='~HQ',
+        description='Solicita informações da impressora',
+        params_required=1,
+        params_description=['query'],
+        command_response=True
+    )
+    HOST_W = ZplCommand(
+        command='^HW',
+        description='Solicita informações da impressora',
+        command_response=True
+    )
+    HOST_XML = ZplCommand(
+        command='^HZ',
+        description='Solicita informações da impressora',
+        command_response=True
+    )
 
     # Propriedades de impressão
     PRINTING_DARKNESS = ZplCommand(

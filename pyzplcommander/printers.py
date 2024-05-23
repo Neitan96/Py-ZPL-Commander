@@ -38,7 +38,6 @@ class ZebraPrinter(ZplCommandSender, ABC):
         Returns:
             dict: Status da impressora.
         """
-        status_dict = {}
 
         status_reg = re.compile(
             '\x02'
@@ -104,8 +103,8 @@ class ZebraPrinter(ZplCommandSender, ABC):
         }
 
         status_dict['label_waiting'] = 'Waiting' if status_dict['label_waiting'] == 1 else 'Not Waiting'
-
         status_dict['print_mode'] = print_mode_dict[str(status_dict['print_mode'])]
+        status_dict['static_ram'] = 'Installed' if status_dict['static_ram'] == 1 else 'Not installed'
 
         return status_dict
 
@@ -115,39 +114,40 @@ class ZebraPrinter(ZplCommandSender, ABC):
         Se a impressora não suportar o comando de status ou a resposta for inválida, retorna None.
 
         Descrição dos valores do dicionário:
-        - interface: Configuração da interface de comunicação.
-            - handshake: Handshake.
-            - parity: Paridade.
-            - status: Status da interface.
-            - stop_bits: Bits de parada.
-            - data_bits: Bits de dados.
+        - interface: Configuração da interface de comunicação, contendo:
+            - handshake: Handshake, Xon/Xoff ou DTR.
+            - parity: Paridade, Odd ou Even.
+            - status: Status da interface, Disabled ou Enabled.
+            - stop_bits: Bits de parada, 2 bits ou 1 bit.
+            - data_bits: Bits de dados, 7 bits ou 8 bits.
             - baud: Velocidade de comunicação.
-        - paper_out: Flag de papel fora.
-        - pause: Flag de pausa.
-        - label_length: Comprimento da etiqueta.
+        - paper_out: Flag de papel fora, Out ou In.
+        - pause: Flag de pausa, Pause ou Resume.
+        - label_length: Comprimento da etiqueta, em pontos.
         - number_of_formats_recv_buf: Número de formatos no buffer de recebimento.
-        - buffer_full: Flag de buffer cheio.
-        - comm_diag_mode: Flag modo de diagnóstico de comunicação.
-        - partial_format: Flag de formato parcial.
-        - corrupt_ram: Flag de RAM corrompida.
-        - under_temp: Temperatura baixa.
-        - over_temp: Temperatura alta.
-        - func_settings: Configurações de função.
-            - media_type: Tipo de mídia.
-            - sensor_profile: Perfil do sensor.
-            - communications_diagnostics: Diagnóstico de comunicação.
-            - print_mode: Modo de impressão.
-        - head_up: Cabeça de impressão levantada.
-        - ribbon_out: Ribbon fora.
-        - thermoal_transfer: Transferência térmica.
-        - print_mode: Modo de impressão.
+        - buffer_full: Flag de buffer cheio, Full ou Not Full.
+        - comm_diag_mode: Flag modo de diagnóstico de comunicação, On ou Off.
+        - partial_format: Flag de formato parcial, Partial ou Full.
+        - corrupt_ram: Flag de RAM corrompida, Data lost ou Not Corrupt.
+        - under_temp: Temperatura baixa, Under Temp ou Normal Temp.
+        - over_temp: Temperatura alta, Over Temp ou Normal Temp.
+        - func_settings: Configurações de função, contendo:
+            - media_type: Tipo de mídia, Die-Cut ou Continuous.
+            - sensor_profile: Perfil do sensor, On ou Off.
+            - communications_diagnostics: Diagnóstico de comunicação, On ou Off.
+            - print_mode: Modo de impressão, Direct Thermal ou Thermal Transfer.
+        - head_up: Cabeça de impressão levantada, Up ou Down.
+        - ribbon_out: Ribbon fora, Out ou In.
+        - thermoal_transfer: Transferência térmica, Thermal Transfer ou Direct Thermal.
+        - print_mode: Modo de impressão, Rewind, Peel-Off, Tear-Off, Cutter, Applicator, Delayed cut, Linerless Peel,
+                        Linerless Rewind, Partial Cutter, RFID, Kiosk, Kiosk CutStream.
         - print_width_mode: Modo de largura de impressão.
-        - label_waiting: Etiqueta esperando.
+        - label_waiting: Etiqueta esperando, Waiting ou Not Waiting.
         - labels_remaining: Etiquetas restantes.
-        - format_while_printing: Formato enquanto imprime.
+        - format_while_printing: Formato enquanto imprime, On ou Off.
         - graphics_stored_in_mem: Gráficos armazenados na memória.
         - password: Senha.
-        - static_ram: RAM estática.
+        - static_ram: RAM estática, Installed ou Not installed.
 
         Notes:
             Quando a impressora está em algumas condições não irá responder ao comando de status, sendo:
@@ -187,7 +187,7 @@ class ZebraPrinter(ZplCommandSender, ABC):
             try:
                 float(x)
                 return True
-            except:
+            except ValueError:
                 return False
         
         status = [x for x in status[3:-3].split('\r\n') if x != '']
@@ -197,6 +197,7 @@ class ZebraPrinter(ZplCommandSender, ABC):
         status = {key: value if not is_float(value) else float(value) for key, value in status}
 
         return status
+
 
 class ZebraPromptFakePrinter(ZebraPrinter):
     """Classe de impressora falsa para testes de prompt de comando."""
@@ -209,6 +210,28 @@ class ZebraPromptFakePrinter(ZebraPrinter):
         return ('030,0,0,0346,000,0,0,0,000,0,0,0\r\n'
                 '000,0,0,1,0,2,4,0,00000000,1,012\r\n'
                 '1234,0\r\n')
+
+    def host_diagnostic(self) -> str:
+        return ('\r\n'
+                'Head Temp = 24\r\n'
+                'Head Temp = 24\r\n'
+                'Ambient Temp = 165\r\n'
+                'Head Test = Test Not Run\r\n'
+                'Darkness Adjust = 17\r\n'
+                'Print Speed = 2.0\r\n'
+                'Slew Speed = 2.0\r\n'
+                'Backfeed Speed = 2.0\r\n'
+                'Static_pitch_length = 0346\r\n'
+                'Dynamic_pitch_length = 0362\r\n'
+                'Max_dynamic_pitch_length = 0366\r\n'
+                'Min_dynamic_pitch_length = 0359\r\n'
+                'COMMAND PFX = ~ : FORMAT PFX = ^ : DELIMITER = ,\r\n'
+                'Dynamic_top_position = 0000\r\n'
+                '\r\n'
+                'No ribbon A/D = 0000\r\n'
+                '\r\n'
+                'PCB Temp = 163\r\n'
+                '')
 
 
 class ZebraNetworkPrinter(ZebraPrinter):
@@ -225,7 +248,7 @@ class ZebraNetworkPrinter(ZebraPrinter):
     host: str
     port: int
 
-    connection: socket.socket
+    connection: socket.socket | None
     default_timeout: float
 
     check_conn_on_send: bool
@@ -251,6 +274,7 @@ class ZebraNetworkPrinter(ZebraPrinter):
     def disconnect(self) -> None:
         """Desconecta-se da impressora."""
         self.connection.close()
+        self.connection = None
 
     def recv_all(self, timeout: float = 2, buffer_size: int = 1024) -> str:
         """Recebe a resposta da impressora.

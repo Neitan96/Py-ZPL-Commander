@@ -1,4 +1,5 @@
-from .core import ZplCommandSender, ZplCommand, ZplCommandParams, ZplCommandsBlock
+from .core import ZplCommandSender, FontDotsProperties, ZebraProperties, ZplDump, ZplCommand, ZplCommandParams
+from .core import ZplCommandsBlock
 
 from .enums import GraphicSymbol, ZplPrintOrientation, DiagonalOrientation, ZplOrientation, ZplDirection
 from .enums import ZplJustification, ZplFont, ZplCharSets

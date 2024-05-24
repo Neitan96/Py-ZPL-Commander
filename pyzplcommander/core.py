@@ -1,5 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Literal
+import copy
 
 
 class ZplCommandSender(ABC):
@@ -30,36 +33,94 @@ class ZplCommandSender(ABC):
             return results
 
 
-class ZplCommand:
-    """ZplCommand é uma classe para representar um comando ZPL.
-
-    Contém informações sobre o comando, como descrição, parâmetros, valores, etc.
+@dataclass
+class FontDotsProperties:
+    """FontDotsProperties é uma classe para representar as propriedades de uma fonte.
+    Usada para armazenar as propriedades de uma fonte de texto para cálculos de impressão.
 
     Args:
-        command (str): O comando ZPL em si, ex: '^FO'
-        description (str, optional): Descrição do comando
-        params_description (list[str], optional): Lista de descrições dos parâmetros
-        params_default (list[str], optional): Lista de valores padrão dos parâmetros
-        params_required (int, optional): Quantidade de parâmetros obrigatórios
-        command_response (bool, optional): Se o comando retorna uma resposta
+        letter_width (int): Largura da letra em pontos
+        letter_height (int): Altura da letra em pontos
+        space_width (int): Largura do espaço em pontos
     """
 
-    command: str
-    description: str
-    params_description: list[str]
-    params_default: list[str]
-    params_required: int
-    command_response: bool
+    letter_width: int  # Largura da letra em pontos
+    letter_height: int  # Altura da letra em pontos
+    space_width: int  # Largura do espaço em pontos
 
-    def __init__(self, command: str, description: str = None,
-                 params_description: list[str] = None, params_default: list[str] = None,
-                 params_required: int = 0, command_response: bool = False):
-        self.command = command
-        self.description = description
-        self.params_description = params_description
-        self.params_default = params_default
-        self.params_required = params_required
-        self.command_response = command_response
+
+@dataclass
+class ZebraProperties:
+    """ZebraProperties é uma classe para representar as propriedades da impressora Zebra.
+    É usada para armazenar as propriedades da impressora, de impressão, de etiquetas ou de campos.
+
+    Feita para cálcular posições e tamanho de campos e etiqueta dinamicamente cam base nos comandos e parâmetros,
+    sem precisar de cálculos manuais.
+
+    Ao cálcular dinamicamente as posições e tamanhos, é possível criar etiquetas e campos de forma dinâmica,
+    sem precisar fazer testes e ajustes manuais.
+    """
+
+    # Propriedades da impressora
+    density: Literal[6, 8, 12, 24] = field(default=8)  # Densidade de impressão em pontos por milímetro
+
+    # Propriedades da etiqueta
+    label_width: int = field(default=101)  # Largura da etiqueta em milímetros
+    label_height: int = field(default=152)  # Altura da etiqueta em milímetros
+
+    # Propriedades voláteis
+    font_dots: FontDotsProperties = field(default=None)  # Propriedades da fonte de texto
+    prefix_format: str = field(default='^')  # Prefixo do formato ZPL
+    prefix_command: str = field(default='~')  # Prefixo do comando ZPL
+    params_delimiter: str = field(default=',')  # Delimitador de parâmetros
+
+
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
+class ZplDump(ABC):
+    """ZplDump é uma classe abstrata para classes que geram um dump de comandos ZPL."""
+
+    @abstractmethod
+    def dump_zpl(self, zebra_props: ZebraProperties = None, break_lines: bool = True) -> str:
+        """Gera um dump de comandos ZPL.
+
+        Args:
+            zebra_props (ZebraProperties, optional): Propriedades da impressora
+            break_lines (bool, optional): Quebra de linha
+        Returns:
+            str: Dump de comandos ZPL
+        """
+        pass
+
+    def get_new_properties(self, zebra_props: ZebraProperties) -> ZebraProperties:
+        """Retorna um novo objeto ZebraProperties com as propriedades atualizadas.
+        Usado para quando o ZPL faz alterações nas propriedades, caso não faça alterações, retorna o mesmo objeto.
+
+        Args:
+            zebra_props (ZebraProperties): Propriedades da impressora
+        """
+        return zebra_props
+
+    def get_origin_position(self, zebra_props: ZebraProperties) -> (int, int):
+        """Retorna a posição inicial do objeto ZPL em pontos.
+
+        Args:
+            zebra_props (ZebraProperties): Propriedades da impressora
+        Returns:
+            int: Posição X em pontos
+            int: Posição Y em pontos
+        """
+        return -1, -1
+
+    def get_size(self, zebra_props: ZebraProperties) -> (int, int):
+        """Retorna o tamanho do objeto ZPL em pontos.
+
+        Args:
+            zebra_props (ZebraProperties): Propriedades da impressora
+        Returns:
+            int: Largura em pontos
+            int: Altura em pontos
+        """
+        return -1, -1
 
     def send_to(self, sender: ZplCommandSender, get_response: bool = False) -> None | str:
         """Envia o comando ZPL.
@@ -68,7 +129,107 @@ class ZplCommand:
             sender (ZplCommandSender): Objeto que envia o comando
             get_response (bool, optional): Obter resposta do comando
         """
-        return sender.send_command(str(self), get_response)
+        return sender.send_command(self.dump_zpl(), get_response)
+
+    def __str__(self):
+        """Retorna o dump de comandos ZPL."""
+        return self.dump_zpl()
+
+
+class ZplCommand(ZplDump):
+    """ZplCommand é uma classe para representar um comando ZPL.
+
+    Contém informações sobre o comando, como descrição, parâmetros, valores, etc.
+
+    Args:
+        command (str): O comando ZPL, ex: '^FO'
+        cmd_type (Literal['format', 'command']): Tipo do comando, 'format' para comandos de formatação
+                                                e 'command' para comandos de impressão
+        description (str, optional): Descrição do comando
+        params_description (list[str], optional): Lista de descrições dos parâmetros
+        params_default (list[str], optional): Lista de valores padrão dos parâmetros
+        params_required (int, optional): Quantidade de parâmetros obrigatórios
+        command_response (bool, optional): Se o comando retorna uma resposta
+    """
+
+    _command: str
+    _cmd_type: Literal['format', 'command']
+    _description: str
+    _params_description: list[str]
+    _params_default: list[str]
+    _params_required: int
+    _command_response: bool
+
+    def __init__(self, command: str, cmd_type: Literal['format', 'command'], description: str = None,
+                 params_description: list[str] = None, params_default: list[str] = None,
+                 params_required: int = 0, command_response: bool = False):
+        self._command = command
+        self._cmd_type = cmd_type
+        self._description = description
+        self._params_description = params_description
+        self._params_default = params_default
+        self._params_required = params_required
+        self._command_response = command_response
+
+    @property
+    def command(self) -> str:
+        """Retorna o comando ZPL."""
+        return self._command
+
+    @property
+    def cmd_type(self) -> Literal['format', 'command']:
+        """Retorna o tipo do comando."""
+        return self._cmd_type
+
+    @property
+    def description(self) -> str:
+        """Retorna a descrição do comando."""
+        return self._description
+
+    @property
+    def params_description(self) -> list[str]:
+        """Retorna a lista de descrições dos parâmetros."""
+        return self._params_description
+
+    @property
+    def params_default(self) -> list[str]:
+        """Retorna a lista de valores padrão dos parâmetros."""
+        return self._params_default
+
+    @property
+    def params_required(self) -> int:
+        """Retorna a quantidade de parâmetros obrigatórios."""
+        return self._params_required
+
+    @property
+    def command_response(self) -> bool:
+        """Retorna se o comando retorna uma resposta."""
+        return self._command_response
+
+    def _prefix_param(self, zebra_props: ZebraProperties = None) -> str:
+        """Retorna o prefixo do comando ZPL.
+
+        Args:
+            zebra_props (ZebraProperties): Propriedades da impressora
+        """
+        if self.cmd_type == 'format':
+            return zebra_props.prefix_format if zebra_props is not None else '^'
+
+        if self.cmd_type == 'command':
+            return zebra_props.prefix_command if zebra_props is not None else '~'
+
+        return ''
+
+    def dump_zpl(self, zebra_props: ZebraProperties = None, break_lines: bool = True) -> str:
+        """Retorna o comando ZPL com prefixo.
+
+        Args:
+            zebra_props (ZebraProperties, optional): Propriedades da impressora
+            break_lines (bool, optional): Quebra de linha
+        Returns:
+            str: Dump de comandos ZPL
+        """
+        return self._prefix_param(zebra_props) + self._command
 
     def get_param_index(self, param: str) -> int:
         """Retorna o índice do parâmetro pelo nome do parâmetro.
@@ -76,17 +237,25 @@ class ZplCommand:
         Args:
             param (str): Nome do parâmetro
         """
-        if param is None or self.params_description is None:
+        if param is None or self._params_description is None:
             return -1
-        return self.params_description.index(param)
+        return self._params_description.index(param)
 
-    def instance_params(self, params: list[str | any] = None) -> ZplCommandParams:
+    def command_params(self, params: list[str | any] = None) -> ZplCommandParams:
         """Cria um novo comando com parâmetros.
 
         Args:
             params (list[str], optional): Lista de parâmetros
         """
         return self(params)
+
+    def __copy__(self):
+        return ZplCommand(self._command, self._cmd_type, self._description, self._params_description,
+                          self._params_default, self._params_required, self._command_response)
+
+    def __deepcopy__(self, memo):
+        return ZplCommand(self._command, self._cmd_type, self._description, self._params_description,
+                          self._params_default, self._params_required, self._command_response)
 
     def __call__(self, *params) -> ZplCommandParams:
         """Cria um novo comando com parâmetros.
@@ -95,17 +264,16 @@ class ZplCommand:
             params: Parâmetros
         """
         params = params[0] if len(params) == 1 and isinstance(params[0], list) else list(params)
-        return ZplCommandParams(self, params)
-
-    def __str__(self):
-        """Retorna o comando ZPL."""
-        return self.command
+        return ZplCommandParams(copy.copy(self), params)
 
     def __repr__(self):
-        return f'<ZplCommand: {self.command}, Description: {self.description}>, Params: {self.params_description}>'
+        return (f'<ZplCommand: {self._command}, '
+                f'Type: {self._cmd_type}, '
+                f'Description: {self._description}>, '
+                f'Params: {self._params_description}>')
 
 
-class ZplCommandParams:
+class ZplCommandParams(ZplDump):
     """ZplCommandParams é uma classe para representar um comando ZPL com parâmetros.
 
     Args:
@@ -119,15 +287,6 @@ class ZplCommandParams:
     def __init__(self, command: ZplCommand | str, params: list[str | any] = None):
         self.command = command
         self.params = [str(param) if param is not None else None for param in params]
-
-    def send_to(self, sender: ZplCommandSender, get_response: bool = False) -> None | str:
-        """Envia o comando ZPL.
-
-        Args:
-            sender (ZplCommandSender): Objeto que envia o comando
-            get_response (bool, optional): Obter resposta do comando
-        """
-        return sender.send_command(str(self), get_response)
 
     def set_param_by_name(self, param: str, value: str):
         """Define o valor de um parâmetro pelo nome do parâmetro.
@@ -202,19 +361,25 @@ class ZplCommandParams:
 
         return ','.join(map(lambda x: '' if x is None else str(x), params[:last_value+1]))
 
-    def format_to_zpl(self) -> str:
-        """Formata o comando com os parâmetros e valor para o formato ZPL."""
-        return str(self)
+    def dump_zpl(self, zebra_props: ZebraProperties = None, break_lines: bool = True) -> str:
+        """Retorna o comando ZPL com parâmetros.
 
-    def __str__(self):
-        """Formata o comando com os parâmetros e valor para o formato ZPL."""
+        Args:
+            zebra_props (ZebraProperties, optional): Propriedades da impressora
+            break_lines (bool, optional): Quebra de linha
+        Returns:
+            str: Dump de comandos ZPL
+        """
+        if isinstance(self.command, ZplDump):
+            return self.command.dump_zpl(zebra_props, break_lines) + self.format_params_to_zpl(self.params)
+
         return str(self.command)+self.format_params_to_zpl(self.params)
 
     def __repr__(self):
-        return f'<ZplCommandValue: {self.command}, Params: {self.params}>'
+        return f'<ZplCommandValue: {self.command.__repr__()}, Params: {",".join(self.params)}>'
 
 
-class ZplCommandsBlock:
+class ZplCommandsBlock(ZplDump):
     """ZplCommandsBlock é uma classe para representar um bloco de comandos ZPL.
 
     Args:
@@ -226,19 +391,26 @@ class ZplCommandsBlock:
     end_block: str
     commands: dict[str, list[ZplCommandParams | str]]
 
+    zpl_dump_zpl: None | str
+    zpl_dump_props: None | ZebraProperties
+    zpl_dump_x: None | int
+    zpl_dump_y: None | int
+    zpl_dump_width: None | int
+    zpl_dump_height: None | int
+
     def __init__(self, start_block: str = None, end_block: str = None):
         self.start_block = start_block
         self.end_block = end_block
         self.commands = {}
+        self._reset_zpl_dump()
 
-    def send_to(self, sender: ZplCommandSender, get_response: bool = False) -> None | str:
-        """Envia o comando ZPL.
-
-        Args:
-            sender (ZplCommandSender): Objeto que envia o comando
-            get_response (bool, optional): Obter resposta do comando
-        """
-        return sender.send_command(str(self), get_response)
+    def _reset_zpl_dump(self):
+        self.zpl_dump_zpl = None
+        self.zpl_dump_props = None
+        self.zpl_dump_x = None
+        self.zpl_dump_y = None
+        self.zpl_dump_width = None
+        self.zpl_dump_height = None
 
     def add_command(self, command: ZplCommandParams | ZplCommandsBlock | str, position: int | str = 0):
         """Adiciona um comando ao bloco.
@@ -251,6 +423,7 @@ class ZplCommandsBlock:
         if position not in self.commands:
             self.commands[position] = []
         self.commands[position].append(command)
+        self._reset_zpl_dump()
         return self
 
     def new_command(self, command: ZplCommand, position: int | str = 0) -> ZplCommandParams:
@@ -277,6 +450,7 @@ class ZplCommandsBlock:
         position = str(position)
         self.commands[position] = []
         self.add_command(command, position)
+        return self
 
     def get_commands(self) -> list[ZplCommandParams | ZplCommandsBlock | str]:
         """Retorna a lista de comandos."""
@@ -290,14 +464,6 @@ class ZplCommandsBlock:
         """
         return self.commands.get(position, [])
 
-    def __str__(self):
-        """Retorna o bloco de comandos."""
-        return self.format_to_zpl(True)
-
-    def __repr__(self):
-        return (f'<ZplCommandsBlock: Start: {str(self.start_block)}, End: {str(self.end_block)}, '
-                f'Commands: {str(self.commands)}>')
-
     def add_zpl_blank_line(self, lines: int = 1):
         """Adiciona uma ou mais linhas em branco no código ZPL.
         Funciona somente quando é formado com quebras de linha.
@@ -307,32 +473,53 @@ class ZplCommandsBlock:
         """
         for _ in range(lines):
             self.add_command('')
+        self._reset_zpl_dump()
         return self
 
-    def _format_commands_to_zpl(self, break_lines: bool = True) -> str:
+    def _format_commands_to_zpl(self, zebra_props: ZebraProperties = None, break_lines: bool = True) -> str:
         """Formata os comandos para o formato ZPL.
 
         Args:
+            zebra_props (ZebraProperties, optional): Propriedades da impressora
             break_lines (bool, optional): Quebra de linha
         """
         lines = []
         for command in self.get_commands():
-            if isinstance(command, ZplCommandsBlock):
-                lines.append(command.format_to_zpl(False))
+            if isinstance(command, ZplDump):
+
+                x, y = command.get_origin_position(zebra_props)
+                if x >= 0:
+                    self.zpl_dump_x = min(x, self.zpl_dump_x)
+                if y >= 0:
+                    self.zpl_dump_y = min(y, self.zpl_dump_y)
+
+                width, height = command.get_size(zebra_props)
+                if width >= 0:
+                    self.zpl_dump_width = max(width, self.zpl_dump_width)
+                if height >= 0:
+                    self.zpl_dump_height = max(height, self.zpl_dump_height)
+
+                new_props = command.get_new_properties(zebra_props)
+                zebra_props = new_props or zebra_props
+
+                lines.append(command.dump_zpl(zebra_props, False))
             else:
                 lines.append(str(command))
         return '\r\n'.join(lines) if break_lines else ''.join(lines)
 
-    def format_to_zpl(self, break_lines: bool = True) -> str:
+    def dump_zpl(self, zebra_props: ZebraProperties = None, break_lines: bool = True) -> str:
         """Formata o bloco de comandos para o formato ZPL.
 
         Args:
+            zebra_props (ZebraProperties, optional): Propriedades da impressora
             break_lines (bool, optional): Quebra de linha
         """
         lines = []
         if self.start_block is not None:
             lines.append(str(self.start_block))
-        lines.append(self._format_commands_to_zpl(break_lines))
+        lines.append(self._format_commands_to_zpl(zebra_props, break_lines))
         if self.end_block is not None:
             lines.append(str(self.end_block))
-        return '\r\n'.join(lines) if break_lines else ''.join(lines)
+        zpl_code = '\r\n'.join(lines) if break_lines else ''.join(lines)
+        self.zpl_dump_zpl = zpl_code
+        return zpl_code
